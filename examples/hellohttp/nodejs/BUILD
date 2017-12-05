@@ -15,14 +15,13 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])  # Apache 2.0
 
-load("@io_bazel_rules_docker//java:image.bzl", "war_image")
+load("@io_bazel_rules_docker//nodejs:image.bzl", "nodejs_image")
 
-war_image(
+nodejs_image(
     name = "server",
-    srcs = ["Servlet.java"],
-    deps = [
-        "@javax_servlet_api//jar",
-    ],
+    data = [":server.js"],
+    entry_point = "io_bazel_rules_k8s/examples/hellohttp/nodejs/server.js",
+    node_modules = "@examples_hellohttp_npm//:node_modules",
 )
 
 load("@k8s_deploy//:defaults.bzl", "k8s_deploy")
@@ -32,5 +31,5 @@ k8s_deploy(
     images = {
         "hello-http-image": ":server",
     },
-    template = "//examples/hellohttp:deployment.json",
+    template = "//examples/hellohttp:deployment.yaml",
 )
